@@ -1,0 +1,9 @@
+mybatis笔记
+###################################################################
+与任何其他Spring Boot应用程序一样，MyBatis-Spring-Boot-Application配置参数存储在 application.properties（或application.yml）中。
+MyBatis使用前缀mybatis作为其属性前缀，使用了该Starter之后，只需要定义一个DataSource即可，
+它会自动创建使用该DataSource的SqlSessionFactoryBean以及SqlSessionTemplate。
+会自动扫描你的Mappers，连接到SqlSessionTemplate，并注册到Spring上下文中。
+
+mybatis还有一些非常重要的设置，直接影响mybatis的运行，一般情况下不要修改，系统将自动使用默认配置，如果要修改
+请先查阅http://www.mybatis.org/mybatis-3/configuration.html#settings里面的详细说明

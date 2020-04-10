@@ -1,0 +1,31 @@
+application.properties笔记
+spring boot项目默认配置的路径src/main/resources/application.properties
+
+###################################################################
+application.properties参数说明
+详细的配置说明看官方文档
+https://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/html/appendix.html#appendix
+
+###################################################################
+application.properties的加载顺序
+用spring boot构建的ssm环境，程序运行以后首先加载的就是application.properties文件
+application.properties和application.yml文件可以放在一下四个位置，加载顺序由上向下：
+1.外置，resources/config/application.properties
+2.外置，resources/application.properties
+3.内置，A classpath /config package
+4.内置，The classpath root
+相同目录application.yml里面的属性就会覆盖application.properties
+实际上还有其他配置是优先于application.properties被加载的，比如 Logback.xml
+服务器配置/数据源配置/日志配置/mybatis配置都可以在这个文件里面配置，如果需要做详细配置，可以单独在其他配置文件里面配置
+
+###################################################################
+关于application.yml和application.properties
+application.yml是结构化的配置文件，结构更加清晰，可读性强
+application.properties是springboot项目自动生成的空白文件
+
+###################################################################
+关于application.properties的多环境配置文件
+spring boot允许你通过命名约定按照一定的格式(application-{profile}.properties)来定义多个配置文件，例如spring.profiles.active=dev
+然后通过在application.properyies通过spring.profiles.active来具体激活一个或者多个配置文件，
+如果没有没有指定任何profile的配置文件的话，spring boot默认会启动application-default.properties。
+

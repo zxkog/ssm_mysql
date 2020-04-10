@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 0.logback配置说明-->
+<!-- 日志级别从低到高分为TRACE < DEBUG < INFO < WARN < ERROR < FATAL，比如设置为WARN，则低于WARN的信息都不会输出 -->
+<!-- scan:当此属性设置为true时，配置文档如果发生改变，将会被重新加载，默认值为true -->
+<!-- scanPeriod:设置监测配置文档是否有修改的时间间隔，如果没有给出时间单位，默认单位是毫秒。当scan为true时，此属性生效。默认的时间间隔为1分钟。 -->
+<!-- debug:当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false。 -->
+<configuration scan="true" scanPeriod="10 seconds" debug="false">
+
+    <!--1.自定义参数：全局配置区域#########################################################-->
+    <!--timestamp：时间戳参数 datePattern：当前时间转换为字符串的格式。例如 datePattern="yyyyMMdd'T'HHmmss"-->
+    <timestamp key="date_y" datePattern="yyyy"/><!--date_y:自定义的时间参数，后面按日期分类时候用得上-->
+    <timestamp key="date_m" datePattern="MM"/><!--date_m:自定义的时间参数，后面按日期分类时候用得上-->
+    <timestamp key="date_d" datePattern="dd"/><!--date_d:自定义的时间参数，后面按日期分类时候用得上-->
+
+    <!--property：用来定义变量值的标签，有两个属性，name的值是变量的名称，value的值时变量定义的值。可以使“${}”来使用变量。-->
+    <property name="APP_NAME" value="SSM001"/><!--APP_NAME:自定义的应用名称-->
+    <property name="LOG_HOME" value="./logs"/><!--LOG_HOME：自定义的日志根目录./logs/${date_y}/${date_m}/${date_d}-->
+
+    <property name="max_History" value="10"/><!--max_History:保留的日志数量-->
+    <property name="max_FileSize" value="10MB"/><!--max_FileSize:每个文件的大小-->
+    <property name="total_SizeCap" value="1000MB"/><!--total_SizeCap:日志文件的总大小-->
+    <property name="CONSOLE_LEVEL" value="INFO"/><!--log_level:过滤的日志等级-->
+    <property name="CONSOLE_LOG" value="${CONSOLE_LOG:-%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
+    <property name="FILE_LEVEL" value="trace"/><!--log_level:过滤的日志等级-->
+    <property name="FILE_LOG" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%thread] %logger{50} - %msg%n"/>
+
+    <!--2.配置#############################################################################-->
+    <contextName>${APP_NAME}</contextName><!--目前没发现有什么用-->
+
+    <!--3.输出彩色的日志到控制台###########################################################-->
+    <!-- 彩色日志依赖的渲染类 -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+    <conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
+    <conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
+    <!-- 输出到控制台 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <!--此日志appender是为开发使用，只配置最底级别，控制台输出的日志级别是大于或等于此级别的日志信息-->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${CONSOLE_LEVEL}</level>
+        </filter>
+        <encoder>
+            <!--<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%-20thread] %logger{50} - %msg%n</pattern>-->
+            <Pattern>${CONSOLE_LOG}</Pattern><!-- 输出彩色的日志，格式是前面定义好的 -->
+            <charset>UTF-8</charset><!-- 设置字符集 -->
+        </encoder>
+    </appender>
+
+    <!--3.按照滚动策略，循环输出日志到文件#################################################-->
+    <appender name="TRACE_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender"><!--RollingFileAppender:提供日志目标文件自动切换的功能-->
+        <!--以滚动的方式输出日志，文件名按照滚动策略自动生成，所以file就不要定义，否则文件名策略不会起效-->
+        <!--<file>${LOG_HOME}/TRACE.log</file>&lt;!&ndash;LOG_HOME：是上面组合好的目录，按照 年 月 日 的方式存放&ndash;&gt;-->
+        <append>true</append><!--是否以追加方式输出。默认为true。-->
+
+        <encoder> <!--对记录事件进行格式化。-->
+            <pattern>${FILE_LOG}</pattern>
+        </encoder>
+
+        <!--rollingPolicy:滚动策略，字幕滚动：大小，时间-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy"><!--SizeAndTimeBasedRollingPolicy表示大小和时间都原来作为触发条件-->
+            <!--fileNamePattern：rollingPolicy的必需的属性，决定了日志滚动时，归档日志的命名策略。它由文件名， %d和%i组成。-->
+            <!--%d{}花括号中需要包含符合SimpleDateFormat约定的时间格式，如果未指定，直接是%d,则默认相当于%d{yyyy-MM-dd}。-->
+            <!--%i代表日志索引号-->
+            <!--%d{yyyy-MM-dd-HH-mm-ss.SSS} 表示使用当前时区-->
+            <!--%d{yyyy-MM-dd-HH-mm-ss.SSS，UTC}表示使用标准0时区-->
+            <fileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}.TRACE.%i.LOG</fileNamePattern><!--以下配置是在trace目录下按日生成一个文件-->
+            <maxHistory>${max_History}</maxHistory><!--maxHistory：控制保留的归档文件的最大数量，删除%d时间格式【最小单位yyyy MM dd HH mm ss SSS】的文件-->
+            <maxFileSize>${max_FileSize}</maxFileSize><!--只有SizeAndTimeBasedRollingPolicy时才有效。maxFileSize：活动文件的大小，默认值是10MB-->
+            <totalSizeCap>${total_SizeCap}</totalSizeCap><!-- 只有SizeAndTimeBasedRollingPolicy时才有效，totalSizeCap：日志总保存量为10GB -->
+        </rollingPolicy>
+
+        <!--为<appender> 添加一个或多个过滤器后，可以用任意条件对日志进行过滤。<appender> 有多个过滤器时，按照配置顺序执行。-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>TRACE</level>
+            <!--过滤器，执行一个过滤器会有返回个枚举值，即DENY，NEUTRAL，ACCEPT其中之一。-->
+            <!--返回DENY，日志将立即被抛弃不再经过其他过滤器；-->
+            <!--返回NEUTRAL，有序列表里的下个过滤器过接着处理日志；-->
+            <!--返回ACCEPT，日志会被立即处理，不再经过剩余过滤器。-->
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <appender name="DEBUG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <append>true</append>
+        <encoder>
+            <pattern>${FILE_LOG}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}.DEBUG.%i.LOG</fileNamePattern>
+            <maxHistory>${max_History}</maxHistory>
+            <maxFileSize>${max_FileSize}</maxFileSize>
+            <totalSizeCap>${total_SizeCap}</totalSizeCap>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <append>true</append>
+        <encoder>
+            <pattern>${FILE_LOG}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}.INFO.%i.log</fileNamePattern>
+            <maxHistory>${max_History}</maxHistory>
+            <maxFileSize>${max_FileSize}</maxFileSize>
+            <totalSizeCap>${total_SizeCap}</totalSizeCap>
+        </rollingPolicy>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <appender name="WARN_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <append>true</append>
+        <encoder>
+            <pattern>${FILE_LOG}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}.WARN.%i.log</fileNamePattern>
+            <maxHistory>${max_History}</maxHistory>
+            <maxFileSize>${max_FileSize}</maxFileSize>
+            <totalSizeCap>${total_SizeCap}</totalSizeCap>
+        </rollingPolicy>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <append>true</append>
+        <encoder>
+            <pattern>${FILE_LOG}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}.ERROR.%i.log</fileNamePattern>
+            <maxHistory>${max_History}</maxHistory>
+            <maxFileSize>${max_FileSize}</maxFileSize>
+            <totalSizeCap>${total_SizeCap}</totalSizeCap>
+        </rollingPolicy>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <appender name="ALL_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <append>true</append>
+        <encoder>
+            <pattern>${FILE_LOG}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}.ALL.%i.log</fileNamePattern>
+            <maxHistory>${max_History}</maxHistory>
+            <maxFileSize>${max_FileSize}</maxFileSize>
+            <totalSizeCap>${total_SizeCap}</totalSizeCap>
+        </rollingPolicy>
+
+    </appender>
+    <root level="${FILE_LEVEL}">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="TRACE_FILE"/>
+        <appender-ref ref="DEBUG_FILE"/>
+        <appender-ref ref="INFO_FILE"/>
+        <appender-ref ref="WARN_FILE"/>
+        <appender-ref ref="ERROR_FILE"/>
+        <appender-ref ref="ALL_FILE"/>
+    </root>
+</configuration>

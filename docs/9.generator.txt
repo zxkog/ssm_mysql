@@ -1,0 +1,91 @@
+﻿http://www.mybatis.org/generator/index.html
+
+
+generator是mybatis的一个插件，用来自动生成entity/dao/mapper
+第一步pom里面配置依赖
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <!--#############-->
+            <plugin>
+                <groupId>org.mybatis.generator</groupId>
+                <artifactId>mybatis-generator-maven-plugin</artifactId>
+                <version>1.3.7</version>
+                <configuration>
+                    <verbose>true</verbose>
+                    <overwrite>true</overwrite>
+                </configuration>
+            </plugin>
+            <!--#############-->
+        </plugins>
+    </build>
+第二步resources文件夹里面新建generatorConfig.xml，并写入如下配置
+<?xml version="1.0" encoding="UTF-8"?>
+<!--使用最新版的MBG需要使用下面的xml头，配置文件必须包含下面的DOCTYPE-->
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<!--开始配置：所有的自动生成mybatis代码的配置都写这，为了防止修改配置对功能的影响，配置文件不相互引用-->
+<generatorConfiguration>
+    <!--明确指出驱动文件的路径-->
+    <classPathEntry
+            location="D:/01-Project/01-Project-0002-JAVA/apache-maven-3.6.0/repository/org/mariadb/jdbc/mariadb-java-client/2.4.1/mariadb-java-client-2.4.1.jar"/>
+
+    <context id="default" defaultModelType="flat" targetRuntime="MyBatis3">
+        <commentGenerator>
+            <!--注释控制，true是不在文件内生成注释-->
+            <property name="suppressAllComments" value="true"/>
+        </commentGenerator>
+        <!--连接数据库，根据情况修改-->
+        <jdbcConnection driverClass="org.mariadb.jdbc.Driver"
+                        connectionURL="jdbc:mariadb://127.0.0.1:3306/ssm?useUnicode=true" userId="root" password="toor">
+        </jdbcConnection>
+
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+
+        <!--domain-->
+        <javaModelGenerator targetPackage="com.example.ssm.domain" targetProject="src/main/java">
+            <property name="constructorBased" value="true"/><!-- 是否对model添加 构造函数 -->
+            <property name="enableSubPackages" value="false"/> <!-- 是否允许子包，即targetPackage.schemaName.tableName -->
+            <property name="immutable" value="true"/><!-- 建立的Model对象是否 不可改变  即生成的Model对象不会有 setter方法，只有构造方法 -->
+            <property name="trimStrings" value="true"/><!-- 是否对类CHAR类型的列的数据进行trim操作 -->
+        </javaModelGenerator>
+
+        <!--mapper.xml-->
+        <!--<sqlMapGenerator targetPackage="com.example.ssm.mapper" targetProject="src/main/java">-->
+        <sqlMapGenerator targetPackage="mapper" targetProject="src/main/resources">
+            <property name="enableSubPackages" value="false"/>
+        </sqlMapGenerator>
+
+        <!--mapper interface-->
+        <javaClientGenerator  type="XMLMAPPER" targetPackage="com.example.ssm.dao" targetProject="src/main/java">
+            <property name="enableSubPackages" value=""/>
+            <property name="exampleMethodVisibility" value=""/>
+            <property name="methodNameCalculator" value=""/>
+            <property name="rootInterface" value=""/>
+        </javaClientGenerator>
+
+        <!--table-->
+        <table tableName="user" domainObjectName="user"
+               enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false">
+        </table>
+        <!--<table tableName="sensor" domainObjectName="sensor"-->
+               <!--enableCountByExample="false" enableUpdateByExample="false"-->
+               <!--enableDeleteByExample="false" enableSelectByExample="false"-->
+               <!--selectByExampleQueryId="false">-->
+        <!--</table>-->
+
+    </context>
+</generatorConfiguration>
+
+第三步 点击菜单 运行-》编辑结构-》 加号-》新建maven配置
+名称  填generator
+command line 填mybatis-generator:generate -e
+idea右边点击maven project-》mybatis-generator -》 mybatis-generator：generate -》右键run

@@ -1,0 +1,21 @@
+logback笔记
+###################################################################
+logback官方文档
+https://logback.qos.ch/documentation.html
+
+###################################################################
+logback说明：(来源于官网)
+logback在概念上与log4j非常相似，因为两个项目都是由同一个开发人员创建的。
+更快的实施：基于我们之前关于log4j的工作，已经重写了logback内部，以便在某些关键执行路径上执行大约十倍的速度。不仅logback组件更快，而且内存占用更少。
+大量的测试：Logback提供了在几年和无数小时工作中开发的大量测试。虽然log4j也经过测试，但logback将测试带到了完全不同的水平。
+丰富的文档：Logback附带详细且不断更新的文档。
+过滤器：Logback提供了大量的过滤功能，远远超出了log4j所提供的功能
+
+###################################################################
+默认情况下，Spring Boot会用Logback来记录日志，打印出来的日志级别只有ERROR, WARN 还有INFO
+如果你想要打印debug级别的日志，可以通过application.properites配置debug=true
+Logback默认配置文件名logback.xml logback-spring.xml,加载优先级 logback.xml > application.properties > logback-spring.xml
+官网文档里面建议不要使用logback.xml作为配置名，因为logback.xml加载过早会导致logback.xml配置被后续配置覆盖
+日志级别LEVEL：选项TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF
+application.properites可以完成logback的配置，但是实际使用的时候需要循环输出日志，application.properites配置已经无法满足需要。此时就需要引入外部配置文件。
+logback-spring.xml是官网推荐的配置名称，即使不使用logging.config=classpath:logback-spring.xml这个配置，软件也会在resources里面搜寻logback-spring.xml文件
